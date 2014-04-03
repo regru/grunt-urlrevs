@@ -96,7 +96,7 @@ module.exports = function (grunt) {
 
             var content = grunt.file.read(filename).toString();
 
-            var css = content.replace(/url(?:\s+)?\(([^\)]+)\)/igm, function (match, url) {
+            var css = content.replace(/(?:src=|url\()([^,\)]+)/igm, function (match, url) {
                 // trim spaces, quotes
                 url = url.replace(/^\s+|\s+$/g, '');
                 url = url.replace(/['"]/g, '');
@@ -146,7 +146,7 @@ module.exports = function (grunt) {
                     }
                 }
 
-                return util.format("url('%s')", url);
+                return /(src\s*=)/g.test(match) ? util.format("src='%s'", url) : util.format("url('%s'", url);
             });
 
             // save changes

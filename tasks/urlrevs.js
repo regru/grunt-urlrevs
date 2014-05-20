@@ -119,15 +119,16 @@ module.exports = function (grunt) {
                 // is file an image?
                 if (reFilter.test(url)) {
                     // trim revision if any
-                    url = url.replace(/(\?(.*))/g, '');             // ..query string parameter
                     url = url.replace(/\.(~[0-9A-F]*\.)/ig, '.');   // ..part of pathname
 
+                    var fileUrl = url.replace(/(\?(.*))/g, '');     // ..query string parameter
+
                     // is file exists?
-                    if (!fs.existsSync(options.prefix + url)) {
-                        grunt.fatal("File for " + url + " does not exist!");
+                    if (!fs.existsSync(options.prefix + fileUrl)) {
+                        grunt.fatal("File for " + fileUrl + " does not exist!");
                     }
 
-                    var rev = tree[url];
+                    var rev = tree[fileUrl];
 
                     if (typeof rev !== 'undefined') {
                         // uppercase revision

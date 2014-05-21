@@ -93,6 +93,8 @@ module.exports = function (grunt) {
 
         var replaceContent = function (content) {
             var css = content.replace(/(?:src=|url\()([^,\)]+)/igm, function (match, url) {
+
+                var reDetect = /(src\s*=)/g;
                 // trim spaces, quotes
                 url = url.replace(/^\s+|\s+$/g, '');
                 url = url.replace(/['"]/g, '');
@@ -143,7 +145,7 @@ module.exports = function (grunt) {
                     }
                 }
 
-                return /(src\s*=)/g.test(match) ? util.format("src='%s'", url) : util.format("url('%s'", url);
+                return reDetect.test(match) ? util.format("src='%s'", url) : util.format("url('%s'", url);
             });
 
             return css;

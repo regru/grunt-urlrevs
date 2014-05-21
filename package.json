@@ -33,7 +33,9 @@
     "devDependencies": {
         "grunt": "~0.4.1",
         "grunt-contrib-jshint": "~0.2.0",
-        "jasmine-node": "~v2.0.0"
+        "grunt-mocha-test": "0.10.2",
+        "mocha": "1.19.0",
+        "chai": "1.9.1"
     },
     "peerDependencies": {
         "grunt": "~0.4.1"

@@ -91,11 +91,7 @@ module.exports = function (grunt) {
             reValid  = _.map(options.valid, reCreateNew), // ..allowed urls
             reSkip   = _.map(options.skip, reCreateNew);  // ..skipped urls
 
-        var changeUrls = function (filename, next) {
-            grunt.log.writeln("Processing " + (filename).cyan + "...");
-
-            var content = grunt.file.read(filename).toString();
-
+        var replaceContent = function (content) {
             var css = content.replace(/(?:src=|url\()([^,\)]+)/igm, function (match, url) {
                 // trim spaces, quotes
                 url = url.replace(/^\s+|\s+$/g, '');
@@ -121,7 +117,7 @@ module.exports = function (grunt) {
                     // trim revision if any
                     url = url.replace(/\.(~[0-9A-F]*\.)/ig, '.');   // ..part of pathname
 
-                    var fileUrl = url.replace(/(\?(.*))/g, '');     // ..query string parameter
+                    var fileUrl = url.replace(/(\?|#)(.*)/g, '');     // ..query string parameter or hashes
 
                     // is file exists?
                     if (!fs.existsSync(options.prefix + fileUrl)) {
@@ -150,6 +146,14 @@ module.exports = function (grunt) {
                 return /(src\s*=)/g.test(match) ? util.format("src='%s'", url) : util.format("url('%s'", url);
             });
 
+            return css;
+        };
+
+        var changeUrls = function (filename, next) {
+            grunt.log.writeln("Processing " + (filename).cyan + "...");
+
+            var content = grunt.file.read(filename).toString(),
+                css = replaceContent(content);
             // save changes
             grunt.file.write(filename, css);
             next();

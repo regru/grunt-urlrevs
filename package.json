@@ -32,7 +32,8 @@
     },
     "devDependencies": {
         "grunt": "~0.4.1",
-        "grunt-contrib-jshint": "~0.2.0"
+        "grunt-contrib-jshint": "~0.2.0",
+        "jasmine-node": "~v2.0.0"
     },
     "peerDependencies": {
         "grunt": "~0.4.1"

@@ -9,7 +9,7 @@ exports.replaceContent = function (content, tree, options) {
         reValid  = _.map(options.valid, reCreateNew), // ..allowed urls
         reSkip   = _.map(options.skip, reCreateNew),  // ..skipped urls
         reDetect = /(src\s*=)/g,
-        css = content.replace(/(?:src=|url\()([^,\)]+)/igm, function (match, url) {
+        css = content.replace(/(?:src=\s*|url\()([^,\)]+)/igm, function (match, url) {
             url = url.replace(/^\s+|\s+$/g, '');
             url = url.replace(/['"]/g, '');
 

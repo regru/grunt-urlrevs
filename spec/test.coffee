@@ -1,67 +1,93 @@
 expect = require("chai").expect
-fnc = require("./replaceContent")
+fnc = require("../tasks/lib/replace")
 
 options =
-  upcased: true
-  implant: true
+  abbrev      : 6
+  branch      : 'HEAD'
+  filter      : '\\.(png|jpg|jpeg|gif|svg|eot)'
+  path        : 'root/i'
+  prefix      : ''
+  valid       : [ '' ],
+  skip        : [ '^https?:\\/\\/', '^\\/\\/', '^data:image\\/(sv|pn)g', '^%23' ]
+  implant     : true
+  upcased     : true
+  autocommit  : true
+  message     : 'Wave a magic wand (by urlrevs)'
 
 tree =
-  "/path/to/file/some_image_img-1.png": "275b78"
-  "/path/to/file/some_image_img-2.eot": "ed4da3"
-  "/path/to/file/some_image_img-3.svg": "c4dc67"
-  "/path/to/file/some_image_img-4.jpg": "a6489f"
-  "/path/to/file/some_image_img-5.gif": "5bcf0c"
-  "/path/to/file/some_image_img-6.png": "619e6e"
+  "spec/img-test/some_image_img-1.png": "275b78"
+  "spec/img-test/some_image_img-2.eot": "ed4da3"
+  "spec/img-test/some_image_img-3.svg": "c4dc67"
+  "spec/img-test/some_image_img-4.jpg": "a6489f"
+  "spec/img-test/some_image_img-5.gif": "5bcf0c"
+  "spec/img-test/some_image_img-6.png": "619e6e"
+  "spec/img-test/some_image_img-7.svg": "619e6e"
 
 describe "Tests", ->
   it "Common path", ->
-    expect(".selector {background:url('/path/to/file/some_image_img-1.~275B78.png');}")
-      .to.equal fnc.replaceContent(".selector {background:url(/path/to/file/some_image_img-1.png);}", tree, options)
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-1.png);}", tree, options))
+      .to.equal(".selector {background:url('spec/img-test/some_image_img-1.~275B78.png');}")
     return
 
   it "Path to image in single quote", ->
-    expect(".selector {background:url('/path/to/file/some_image_img-1.~275B78.png');}")
-      .to.equal fnc.replaceContent(".selector {background:url(\"/path/to/file/some_image_img-1.png\");}", tree, options)
+    expect(fnc.replaceContent(".selector {background:url(\"spec/img-test/some_image_img-1.png\");}", tree, options))
+      .to.equal(".selector {background:url('spec/img-test/some_image_img-1.~275B78.png');}")
     return
 
   it "Path to image in double quote", ->
-    expect(".selector {background:url('/path/to/file/some_image_img-1.~275B78.png');}")
-      .to.equal fnc.replaceContent(".selector {background:url('/path/to/file/some_image_img-1.png');}", tree, options)
+    expect(fnc.replaceContent(".selector {background:url(\"spec/img-test/some_image_img-1.png\");}", tree, options))
+      .to.equal(".selector {background:url('spec/img-test/some_image_img-1.~275B78.png');}")
     return
 
   it "Path for fonts", ->
-    expect("@font-face{src:url('/path/to/file/some_image_img-2.eot') format(\"embedded-opentype\")}")
-      .to.equal fnc.replaceContent("@font-face{src:url(\"/path/to/file/some_image_img-2.eot\") format(\"embedded-opentype\")}", tree, options)
+    expect(fnc.replaceContent("@font-face{src:url('spec/img-test/some_image_img-2.eot') format(\"embedded-opentype\")}", tree, options))
+      .to.equal("@font-face{src:url('spec/img-test/some_image_img-2.~ED4DA3.eot') format(\"embedded-opentype\")}")
     return
 
   it "Query hash for IE fix", ->
-    expect("@font-face{src:url('/path/to/file/some_image_img-2.eot?#iefix') format(\"embedded-opentype\")}")
-      .to.equal fnc.replaceContent("@font-face{src:url(\"/path/to/file/some_image_img-2.eot?#iefix\") format(\"embedded-opentype\")}", tree, options)
+    expect(fnc.replaceContent("@font-face{src:url(\"spec/img-test/some_image_img-2.eot?#iefix\") format(\"embedded-opentype\")}", tree, options))
+      .to.equal("@font-face{src:url('spec/img-test/some_image_img-2.~ED4DA3.eot?#iefix') format(\"embedded-opentype\")}")
     return
 
   it "Hash for svg", ->
-    expect(".selector {background:url('/path/to/file/some_image_img-3.svg#iefix');}")
-      .to.equal fnc.replaceContent(".selector {background:url(/path/to/file/some_image_img-3.svg#iefix);}", tree, options)
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-3.svg#iefix);}", tree, options))
+      .to.equal(".selector {background:url('spec/img-test/some_image_img-3.~C4DC67.svg#iefix');}")
     return
 
   it "Image path for IE", ->
-    expect(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='/path/to/file/some_image_img-6.~619E6E.png')}")
-      .to.equal fnc.replaceContent(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='/path/to/file/some_image_img-6.png')}", tree, options)
+    expect(fnc.replaceContent(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='spec/img-test/some_image_img-6.png')}", tree, options))
+      .to.equal(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='spec/img-test/some_image_img-6.~619E6E.png')}")
     return
 
   it "Image path for IE (with #hash)", ->
-    expect(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='/path/to/file/some_image_img-3.svg#hash')}")
-    .to.equal fnc.replaceContent(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='/path/to/file/some_image_img-3.svg#hash')}", tree, options)
+    expect(fnc.replaceContent(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='spec/img-test/some_image_img-3.svg#hash')}", tree, options))
+    .to.equal(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='spec/img-test/some_image_img-3.~C4DC67.svg#hash')}")
     return
 
   it "Base64", ->
-    expect(".selector {background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/P);}")
-    .to.equal fnc.replaceContent(".selector {background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/P);}", tree, options)
+    expect(fnc.replaceContent(".selector {background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/P);}", tree, options))
+    .to.equal(".selector {background-image:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/P);}")
     return
 
   it "Common svg #hash", ->
-    expect(".selector {background:url('/path/to/file/some_image_img-7.svg#iefix');}")
-    .to.equal fnc.replaceContent(".selector {background:url(/path/to/file/some_image_img-7.svg#iefix);}", tree, options)
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg#iefix);}", tree, options))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg#iefix');}")
+    return
+
+  it "Error: empty url", ->
+    expect -> fnc.replaceContent(".selector {background:url();}", tree, options)
+    .to.throw('Empty URLs are not supported!');
+    return
+
+  it "Error: empty src", ->
+    expect -> fnc.replaceContent(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src=)}", tree, options)
+      .to.throw('Empty URLs are not supported!');
+    return
+
+  it "Error: file not exist", ->
+    expect -> fnc.replaceContent(".selector {_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='spec/img-test/some_image_img-8.~C4DC67.svg#hash')}", tree, options)
+      .to.throw('File for spec/img-test/some_image_img-8.svg does not exist!');
     return
 
 return
+

@@ -81,10 +81,10 @@ module.exports = function (grunt) {
 
         var changeUrls = function (filename, next) {
             grunt.log.writeln("Processing " + (filename).cyan + "...");
-
+            var content = grunt.file.read(filename).toString(),
+                css;
             try {
-                var content = grunt.file.read(filename).toString(),
-                    css = replaceContent(content, tree, options);
+                css = replaceContent(content, tree, options);
             } 
 
             catch (error) {

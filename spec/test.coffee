@@ -14,6 +14,19 @@ options =
   autocommit  : true
   message     : 'Wave a magic wand (by urlrevs)'
 
+optionsTestImplant =
+  abbrev      : 6
+  branch      : 'HEAD'
+  filter      : '\\.(png|jpg|jpeg|gif|svg|eot)'
+  path        : 'root/i'
+  prefix      : ''
+  valid       : [ '' ],
+  skip        : [ '^https?:\\/\\/', '^\\/\\/', '^data:image\\/(sv|pn)g', '^%23' ]
+  implant     : false
+  upcased     : true
+  autocommit  : true
+  message     : 'Wave a magic wand (by urlrevs)'
+
 tree =
   "spec/img-test/some_image_img-1.png": "275b78"
   "spec/img-test/some_image_img-2.eot": "ed4da3"
@@ -72,6 +85,51 @@ describe "Tests", ->
   it "Common svg #hash", ->
     expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg#iefix);}", tree, options))
     .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg#iefix');}")
+    return
+
+  it "URL was implant", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.~AAAAAA.svg#iefix);}", tree, options))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg#iefix');}")
+    return
+
+  it "URL with 2 params in qs", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?qwerty=12345&AAAAAA#iefix);}", tree, options))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg?qwerty=12345#iefix');}")
+    return
+
+  it "URL with 1 param in qs", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?AAAAAA#iefix);}", tree, options))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg#iefix');}")
+    return
+
+  it "URL without implant", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?AAAAAA#iefix);}", tree, optionsTestImplant))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.svg?619E6E#iefix');}")
+    return
+
+  it "URL without implant, has 2 params in qs, rev is last", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?qwerty=123&AAAAAA);}", tree, optionsTestImplant))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.svg?qwerty=123&619E6E');}")
+    return
+
+  it "URL without implant, has 2 params in qs, rev is first", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?AAAAAA&qwerty=123);}", tree, optionsTestImplant))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.svg?qwerty=123&619E6E');}")
+    return
+
+  it "URL without implant, has 3 params in qs", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?qwerty2=123&AAAAAA&qwerty=123);}", tree, optionsTestImplant))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.svg?qwerty2=123&qwerty=123&619E6E');}")
+    return
+
+  it "URL with empty search", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?);}", tree, optionsTestImplant))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.svg?619E6E');}")
+    return
+
+  it "URL with empty search, implant", ->
+    expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?);}", tree, options))
+    .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg');}")
     return
 
   it "Error: empty url", ->

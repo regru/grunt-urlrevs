@@ -97,6 +97,15 @@ describe "Tests", ->
     .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg?qwerty=12345#iefix');}")
     return
 
+  it "Multiline css", ->
+    expect(fnc.replaceContent("#fancybox-loading.fancybox-ie div  { background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='spec/img-test/some_image_img-7.svg', sizingMethod='scale'); }
+      .fancybox-ie #fancybox-close    { background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='spec/img-test/some_image_img-7.svg', sizingMethod='scale'); }
+
+      .fancybox-ie #fancybox-title-over { background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='spec/img-test/some_image_img-7.svg', sizingMethod='scale'); zoom: 1; }
+      ", tree, options))
+    .to.equal("#fancybox-loading.fancybox-ie div  { background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='spec/img-test/some_image_img-7.~619E6E.svg', sizingMethod='scale'); }      .fancybox-ie #fancybox-close    { background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='spec/img-test/some_image_img-7.~619E6E.svg', sizingMethod='scale'); }      .fancybox-ie #fancybox-title-over { background: transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='spec/img-test/some_image_img-7.~619E6E.svg', sizingMethod='scale'); zoom: 1; }      ")
+    return
+
   it "URL with 1 param in qs", ->
     expect(fnc.replaceContent(".selector {background:url(spec/img-test/some_image_img-7.svg?AAAAAA#iefix);}", tree, options))
     .to.equal(".selector {background:url('spec/img-test/some_image_img-7.~619E6E.svg#iefix');}")

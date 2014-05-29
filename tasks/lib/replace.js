@@ -1,15 +1,16 @@
+var util = require('util'),
+    fs   = require('fs'),
+    urlLib   = require('url'),
+    _ = require("grunt").util._;
+
 exports.replaceContent = function (content, tree, options) {
-    var util = require('util'),
-        fs   = require('fs'),
-        urlLib   = require('url'),
-        _ = require("grunt").util._,
-        reCreateNew = function (re) {
+    var reCreateNew = function (re) {
             return new RegExp(re, 'i');
         },
         reFilter = reCreateNew(options.filter),       // ..images
         reValid  = _.map(options.valid, reCreateNew), // ..allowed urls
         reSkip   = _.map(options.skip, reCreateNew),  // ..skipped urls
-        reDetect = /(src\s*=)/g,
+        reDetect = new RegExp(/src\s*=/),
         css = content.replace(/(?:src\s*=\s*|url\()([^,\)]+)/g, function (match, url) {
             var qsParams, urlObj;
 
